@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verdiana Ask — Rise Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dim: #C9A84C33;
+    --black: #0A0A0A;
+    --surface: #111111;
+    --surface2: #1A1A1A;
+    --gray: #888888;
+    --light: #F5F0E8;
+    --white: #FFFFFF;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Outfit', sans-serif;
+    overflow: hidden;
+  }
+
+  /* SCREENS */
+  .screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+  .screen.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: var(--gold);
+    transition: width 0.6s ease;
+    z-index: 100;
+  }
+
+  /* LOGO */
+  .logo {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    z-index: 100;
+  }
+
+  /* VIDEO CONTAINER */
+  .video-wrap {
+    position: relative;
+    width: min(360px, 90vw);
+    aspect-ratio: 9/16;
+    max-height: 60vh;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--gold-dim);
+    flex-shrink: 0;
+  }
+
+  .video-wrap iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  /* FORM AREA */
+  .form-area {
+    width: min(400px, 92vw);
+    margin-top: 24px;
+    animation: slideUp 0.4s ease;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* CHOICES */
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+
+  .choice-btn {
+    width: 100%;
+    padding: 14px 20px;
+    background: var(--surface);
+    border: 1px solid #333;
+    border-radius: 12px;
+    color: var(--white);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .choice-btn:hover {
+    border-color: var(--gold);
+    background: var(--surface2);
+    transform: translateX(4px);
+  }
+
+  .choice-btn.selected {
+    border-color: var(--gold);
+    background: #1a1400;
+    color: var(--gold-light);
+  }
+
+  /* CTA BUTTON */
+  .cta-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--gold);
+    border: none;
+    border-radius: 12px;
+    color: var(--black);
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: all 0.2s ease;
+    margin-top: 14px;
+  }
+
+  .cta-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+  .cta-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* OPEN TEXT */
+  .open-textarea {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid #333;
+    border-radius: 12px;
+    color: var(--white);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    resize: none;
+    height: 100px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .open-textarea:focus { border-color: var(--gold); }
+  .open-textarea::placeholder { color: #555; }
+
+  /* CONTACT FORM */
+  .contact-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid #333;
+    border-radius: 12px;
+    color: var(--white);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 10px;
+  }
+
+  .contact-input:focus { border-color: var(--gold); }
+  .contact-input::placeholder { color: #555; }
+
+  /* THANK YOU */
+  .thankyou-screen {
+    text-align: center;
+    padding: 0 24px;
+  }
+
+  .gold-line {
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    margin: 20px auto;
+  }
+
+  .thankyou-screen h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    font-weight: 300;
+    color: var(--white);
+    line-height: 1.2;
+  }
+
+  .thankyou-screen p {
+    color: var(--gray);
+    font-size: 15px;
+    line-height: 1.7;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  .step-label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  /* PLAY OVERLAY */
+  .play-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.3);
+    cursor: pointer;
+    z-index: 2;
+    transition: opacity 0.3s;
+  }
+
+  .play-overlay.hidden { opacity: 0; pointer-events: none; }
+
+  .play-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .play-btn svg { margin-left: 4px; }
+
+  /* INTRO SCREEN */
+  .intro-content { text-align: center; padding: 0 32px; }
+
+  .intro-content h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 8vw, 52px);
+    font-weight: 300;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+
+  .intro-content h1 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .intro-content p {
+    color: var(--gray);
+    font-size: 15px;
+    line-height: 1.7;
+    max-width: 300px;
+    margin: 0 auto 32px;
+  }
+
+  .scroll-hint {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: #444;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar" style="width: 0%"></div>
+<div class="logo">Rise Lab</div>
+
+<!-- INTRO -->
+<div class="screen active" id="screen-intro">
+  <div class="intro-content">
+    <h1>Studiare<br>non dovrebbe<br>essere una <em>lotta.</em></h1>
+    <p>Verdiana ti fa alcune domande. Ci vogliono 2 minuti.</p>
+    <button class="cta-btn" style="max-width:280px" onclick="goToStep(0)">Inizia →</button>
+  </div>
+</div>
+
+<!-- STEP 0: CLIP 1 HOOK -->
+<div class="screen" id="screen-0">
+  <div class="step-label">Rise Lab · Verdiana</div>
+  <div class="video-wrap">
+    <iframe id="vid-0" src="https://www.youtube.com/embed/GFapoICvD7w?enablejsapi=1&rel=0&modestbranding=1" allowfullscreen allow="autoplay"></iframe>
+  </div>
+  <div class="form-area">
+    <button class="cta-btn" onclick="goToStep(1)">Continua →</button>
+  </div>
+</div>
+
+<!-- STEP 1: CLIP 2 CONOSCIAMOCI -->
+<div class="screen" id="screen-1">
+  <div class="step-label">1 di 5</div>
+  <div class="video-wrap">
+    <iframe id="vid-1" src="https://www.youtube.com/embed/i8tYrdGknSc?enablejsapi=1&rel=0&modestbranding=1" allowfullscreen allow="autoplay"></iframe>
+  </div>
+  <div class="form-area">
+    <div class="choices">
+      <button class="choice-btn" onclick="selectChoice(this, 'chi', '🙋 Per me')">🙋 Per me</button>
+      <button class="choice-btn" onclick="selectChoice(this, 'chi', '👨‍👧 Per mio figlio')">👨‍👧 Per mio figlio</button>
+      <button class="choice-btn" onclick="selectChoice(this, 'chi', '📚 Sono un insegnante')">📚 Sono un insegnante</button>
+    </div>
+    <button class="cta-btn" id="btn-1" onclick="goToStep(2)" disabled>Continua →</button>
+  </div>
+</div>
+
+<!-- STEP 2: CLIP 3 LA SITUAZIONE -->
+<div class="screen" id="screen-2">
+  <div class="step-label">2 di 5</div>
+  <div class="video-wrap">
+    <iframe id="vid-2" src="https://www.youtube.com/embed/5lhe5UUagWc?enablejsapi=1&rel=0&modestbranding=1" allowfullscreen allow="autoplay"></iframe>
+  </div>
+  <div class="form-area">
+    <div class="choices">
+      <button class="choice-btn" onclick="selectChoice(this, 'situazione', '🌀 Non riesce a concentrarsi')">🌀 Non riesce a concentrarsi</button>
+      <button class="choice-btn" onclick="selectChoice(this, 'situazione', '🧠 Studia ma non ricorda niente')">🧠 Studia ma non ricorda niente</button>
+      <button class="choice-btn" onclick="selectChoice(this, 'situazione', '📖 Non vuole aprire un libro')">📖 Non vuole aprire un libro</button>
+      <button class="choice-btn" onclick="selectChoice(this, 'situazione', '😰 Si blocca sotto stress e ansia')">😰 Si blocca sotto stress e ansia</button>
+      <button class="choice-btn" onclick="selectChoice(this, 'situazione', '✨ È brillante ma i voti non lo dimostrano')">✨ È brillante ma i voti non lo dimostrano</button>
+    </div>
+    <button class="cta-btn" id="btn-2" onclick="goToStep(3)" disabled>Continua →</button>
+  </div>
+</div>
+
+<!-- STEP 3: CLIP 4 I TENTATIVI -->
+<div class="screen" id="screen-3">
+  <div class="step-label">3 di 5</div>
+  <div class="video-wrap">
+    <iframe id="vid-3" src="https://www.youtube.com/embed/0Ic5YNPCiuo?enablejsapi=1&rel=0&modestbranding=1" allowfullscreen allow="autoplay"></iframe>
+  </div>
+  <div class="form-area">
+    <div class="choices">
+      <button class="choice-btn" onclick="selectChoice(this, 'tentativi', '😕 Sì ma non ha funzionato')">😕 Sì ma non ha funzionato</button>
+      <button class="choice-btn" onclick="selectChoice(this, 'tentativi', '📝 Abbiamo provato ripetizioni')">📝 Abbiamo provato ripetizioni</button>
+      <button class="choice-btn" onclick="selectChoice(this, 'tentativi', '🤷 Non sapevo da dove iniziare')">🤷 Non sapevo da dove iniziare</button>
+      <button class="choice-btn" onclick="selectChoice(this, 'tentativi', '🌱 Prima volta che cerco aiuto')">🌱 Prima volta che cerco aiuto</button>
+    </div>
+    <button class="cta-btn" id="btn-3" onclick="goToStep(4)" disabled>Continua →</button>
+  </div>
+</div>
+
+<!-- STEP 4: CLIP 5 DESIDERIO REALE -->
+<div class="screen" id="screen-4">
+  <div class="step-label">4 di 5</div>
+  <div class="video-wrap">
+    <iframe id="vid-4" src="https://www.youtube.com/embed/JOuEh9OAsVU?enablejsapi=1&rel=0&modestbranding=1" allowfullscreen allow="autoplay"></iframe>
+  </div>
+  <div class="form-area">
+    <textarea class="open-textarea" id="desiderio" placeholder="Scrivimi qui..." oninput="checkTextarea('desiderio', 'btn-4')"></textarea>
+    <button class="cta-btn" id="btn-4" onclick="goToStep(5)" disabled>Continua →</button>
+  </div>
+</div>
+
+<!-- STEP 5: CLIP 6 CONTATTO -->
+<div class="screen" id="screen-5">
+  <div class="step-label">5 di 5</div>
+  <div class="video-wrap">
+    <iframe id="vid-5" src="https://www.youtube.com/embed/uQKUZxJKPY0?enablejsapi=1&rel=0&modestbranding=1" allowfullscreen allow="autoplay"></iframe>
+  </div>
+  <div class="form-area">
+    <input type="text" class="contact-input" id="nome" placeholder="Il tuo nome" oninput="checkContact()">
+    <input type="text" class="contact-input" id="contatto" placeholder="Numero di telefono o email" oninput="checkContact()">
+    <button class="cta-btn" id="btn-5" onclick="submitForm()" disabled>Invia →</button>
+  </div>
+</div>
+
+<!-- THANK YOU -->
+<div class="screen" id="screen-thankyou">
+  <div class="thankyou-screen">
+    <div style="font-size:32px">✦</div>
+    <div class="gold-line"></div>
+    <h1>Grazie.<br>Ti risponde<br>Monia.</h1>
+    <div class="gold-line"></div>
+    <p>Abbiamo ricevuto le tue risposte. Monia ti contatterà personalmente nelle prossime ore.</p>
+  </div>
+</div>
+
+<script>
+  let currentStep = -1;
+  const totalSteps = 6;
+  const answers = {};
+
+  function goToStep(step) {
+    const prev = currentStep === -1 ? 'intro' : currentStep;
+    document.getElementById(currentStep === -1 ? 'screen-intro' : `screen-${currentStep}`).classList.remove('active');
+    currentStep = step;
+    document.getElementById(`screen-${step}`).classList.add('active');
+    const progress = ((step + 1) / (totalSteps + 1)) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+  }
+
+  function selectChoice(btn, field, value) {
+    const group = btn.closest('.choices').querySelectorAll('.choice-btn');
+    group.forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    answers[field] = value;
+    const stepNum = btn.closest('.screen').id.split('-')[1];
+    const cta = document.getElementById(`btn-${stepNum}`);
+    if (cta) cta.disabled = false;
+  }
+
+  function checkTextarea(id, btnId) {
+    const val = document.getElementById(id).value.trim();
+    answers['desiderio'] = val;
+    document.getElementById(btnId).disabled = val.length < 3;
+  }
+
+  function checkContact() {
+    const nome = document.getElementById('nome').value.trim();
+    const contatto = document.getElementById('contatto').value.trim();
+    answers['nome'] = nome;
+    answers['contatto'] = contatto;
+    document.getElementById('btn-5').disabled = !(nome.length > 1 && contatto.length > 4);
+  }
+
+  function submitForm() {
+    document.getElementById('screen-5').classList.remove('active');
+    document.getElementById('screen-thankyou').classList.add('active');
+    document.getElementById('progressBar').style.width = '100%';
+    sendToSheet(answers);
+  }
+
+  function sendToSheet(data) {
+    const SHEET_URL = 'INSERISCI_QUI_URL_GOOGLE_APPS_SCRIPT';
+    if (SHEET_URL.includes('INSERISCI')) return;
+    fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).catch(() => {});
+  }
+</script>
+</body>
+</html>
