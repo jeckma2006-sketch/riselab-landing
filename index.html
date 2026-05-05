@@ -3,464 +3,892 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Verdiana Ask — Rise Lab</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Rise Lab — Verdiana & Monia</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --gold: #C9A84C;
+  --gold-light: #E8C97A;
+  --gold-dim: rgba(201,168,76,0.25);
+  --black: #0A0A0A;
+  --surface: #111111;
+  --surface2: #1A1A1A;
+  --gray: #666;
+  --ivory: #F0EBE0;
+  --white: #FFFFFF;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Outfit', sans-serif;
+  cursor: none;
+  overflow-x: hidden;
+}
 
-  :root {
-    --gold: #C9A84C;
-    --gold-light: #E8C97A;
-    --gold-dim: #C9A84C33;
-    --black: #0A0A0A;
-    --surface: #111111;
-    --surface2: #1A1A1A;
-    --gray: #888888;
-    --light: #F5F0E8;
-    --white: #FFFFFF;
-  }
+/* CURSOR */
+#cursor {
+  position: fixed;
+  width: 32px; height: 32px;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease;
+}
+#cursor svg { display: block; }
 
-  html, body {
-    height: 100%;
-    background: var(--black);
-    color: var(--white);
-    font-family: 'Outfit', sans-serif;
-    overflow: hidden;
-  }
+/* PROGRESS TOP */
+.top-bar {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 2px; background: transparent; z-index: 100;
+}
+.top-bar-fill {
+  height: 100%; background: var(--gold);
+  width: 0%; transition: width 0.5s ease;
+}
 
-  /* SCREENS */
-  .screen {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.5s ease;
-  }
-  .screen.active {
-    opacity: 1;
-    pointer-events: all;
-  }
+/* LOGO HEADER */
+.site-header {
+  position: fixed; top: 0; left: 0; right: 0;
+  padding: 20px 40px; z-index: 99;
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(10,10,10,0.9) 0%, transparent 100%);
+}
+.site-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px; letter-spacing: 0.3em;
+  color: var(--gold); text-transform: uppercase;
+}
+.site-nav { display: flex; gap: 24px; }
+.site-nav a {
+  font-size: 12px; letter-spacing: 0.1em; color: var(--gray);
+  text-decoration: none; text-transform: uppercase;
+  transition: color 0.2s;
+}
+.site-nav a:hover { color: var(--gold); }
 
-  /* PROGRESS BAR */
-  .progress-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 2px;
-    background: var(--gold);
-    transition: width 0.6s ease;
-    z-index: 100;
-  }
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 120px 40px 80px;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 60%, rgba(201,168,76,0.06) 0%, transparent 70%);
+}
+.hero-eyebrow {
+  font-size: 11px; letter-spacing: 0.25em; color: var(--gold);
+  text-transform: uppercase; margin-bottom: 24px;
+}
+.hero h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(48px, 7vw, 96px);
+  font-weight: 300; line-height: 1.08;
+  color: var(--white); margin-bottom: 24px;
+}
+.hero h1 em { font-style: italic; color: var(--gold); }
+.hero-sub {
+  font-size: 16px; color: var(--gray); line-height: 1.7;
+  max-width: 480px; margin: 0 auto 48px;
+}
+.hero-ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.btn-primary {
+  padding: 14px 32px; background: var(--gold);
+  border: none; border-radius: 8px;
+  font-family: 'Outfit', sans-serif; font-size: 13px;
+  font-weight: 500; letter-spacing: 0.06em;
+  color: var(--black); text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+  display: inline-block;
+}
+.btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+.btn-secondary {
+  padding: 14px 32px; background: transparent;
+  border: 1px solid rgba(201,168,76,0.4); border-radius: 8px;
+  font-family: 'Outfit', sans-serif; font-size: 13px;
+  font-weight: 400; letter-spacing: 0.06em;
+  color: var(--gold); text-decoration: none;
+  transition: border-color 0.2s, transform 0.2s;
+  display: inline-block;
+}
+.btn-secondary:hover { border-color: var(--gold); transform: translateY(-2px); }
+.hero-scroll {
+  position: absolute; bottom: 40px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px; letter-spacing: 0.15em;
+  color: #333; text-transform: uppercase;
+  animation: float 2s ease-in-out infinite;
+}
+@keyframes float { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)} }
 
-  /* LOGO */
-  .logo {
-    position: fixed;
-    top: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 13px;
-    letter-spacing: 0.25em;
-    color: var(--gold);
-    text-transform: uppercase;
-    z-index: 100;
-  }
+/* SECTION DIVIDER */
+.section-divider {
+  display: flex; align-items: center; gap: 20px;
+  padding: 0 40px; margin: 0 auto;
+  max-width: 1200px;
+}
+.divider-line { flex: 1; height: 1px; background: #1e1e1e; }
+.divider-label {
+  font-size: 11px; letter-spacing: 0.2em;
+  color: var(--gray); text-transform: uppercase;
+  white-space: nowrap;
+}
 
-  /* VIDEO CONTAINER */
-  .video-wrap {
-    position: relative;
-    width: min(360px, 90vw);
-    aspect-ratio: 9/16;
-    max-height: 60vh;
-    border-radius: 16px;
-    overflow: hidden;
-    background: var(--surface);
-    border: 1px solid var(--gold-dim);
-    flex-shrink: 0;
-  }
+/* VIDEOASK SECTION */
+.va-section {
+  padding: 80px 40px;
+  max-width: 1200px; margin: 0 auto;
+}
+.va-intro { margin-bottom: 48px; }
+.va-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; letter-spacing: 0.15em;
+  color: var(--gold); text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.va-tag::before {
+  content: ''; width: 20px; height: 1px; background: var(--gold);
+}
+.va-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 300; line-height: 1.15;
+  margin-bottom: 12px;
+}
+.va-desc { font-size: 15px; color: var(--gray); line-height: 1.7; max-width: 460px; }
 
-  .video-wrap iframe {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-  }
+/* SPLIT LAYOUT */
+.split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(201,168,76,0.1);
+  min-height: 620px;
+  position: relative;
+}
+.split-left {
+  background: var(--black);
+  padding: 40px 32px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 20px;
+  position: relative; z-index: 1;
+}
+.split-right {
+  padding: 40px 36px;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+.split-right::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(to right,
+    #0A0A0A 0%, #0b0b09 5%, #0d0c09 10%,
+    #0f0e0a 15%, #11100b 20%, #13120c 25%,
+    #16140d 30%, #19160e 35%, #1c190f 38%,
+    #201c10 41%, #241f12 44%, #292314 47%,
+    #2e2716 50%, #342c18 53%, #3b321b 56%,
+    #44391f 59%, #4e4223 62%, #5a4d28 65%,
+    #69592e 68%, #7a6836 71%, #8d7a40 74%,
+    #a08e4c 77%, #b3a05a 80%, #c3b06a 83%,
+    #d0be7e 86%, #dac994 89%, #e3d4a8 92%,
+    #eadebb 95%, #EEE8D8 97%, #F0EBE0 100%
+  );
+  z-index: 0;
+}
+.split-right > * { position: relative; z-index: 1; }
 
-  /* FORM AREA */
-  .form-area {
-    width: min(400px, 92vw);
-    margin-top: 24px;
-    animation: slideUp 0.4s ease;
-  }
+/* VIDEO BOX */
+.video-box {
+  width: 100%; max-width: 260px;
+  aspect-ratio: 9/16; max-height: 420px;
+  border-radius: 12px; overflow: hidden;
+  background: #0d0d0d;
+  border: 1px solid rgba(201,168,76,0.15);
+  position: relative; flex-shrink: 0;
+}
+.video-box iframe {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; border: none;
+}
+.video-loading {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: #0d0d0d; z-index: 2;
+}
+.video-loading-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--gold); opacity: 0.6;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{transform:scale(1);opacity:0.6} 50%{transform:scale(1.4);opacity:1} }
 
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+/* STEP LABEL */
+.step-label {
+  font-size: 11px; letter-spacing: 0.15em;
+  color: var(--gold); text-transform: uppercase;
+  text-align: center;
+}
 
-  /* CHOICES */
-  .choices { display: flex; flex-direction: column; gap: 10px; }
+/* ANSWERS */
+.answers-wrap {
+  width: 100%; max-width: 300px;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none;
+}
+.answers-wrap.visible {
+  opacity: 1; transform: translateY(0);
+  pointer-events: all;
+}
+.choices { display: flex; flex-direction: column; gap: 8px; }
+.choice-btn {
+  width: 100%; padding: 11px 16px;
+  background: var(--surface);
+  border: 1px solid #252525; border-radius: 10px;
+  color: #ccc; font-family: 'Outfit', sans-serif;
+  font-size: 13px; text-align: left;
+  transition: all 0.2s; display: flex;
+  align-items: center; gap: 10px;
+}
+.choice-btn:hover { border-color: var(--gold); background: #1a1400; color: var(--gold-light); }
+.choice-btn.selected { border-color: var(--gold); background: #1a1400; color: var(--gold-light); }
+.open-textarea {
+  width: 100%; padding: 12px 14px;
+  background: var(--surface); border: 1px solid #252525;
+  border-radius: 10px; color: var(--white);
+  font-family: 'Outfit', sans-serif; font-size: 13px;
+  resize: none; height: 90px; outline: none;
+  transition: border-color 0.2s;
+}
+.open-textarea:focus { border-color: var(--gold); }
+.open-textarea::placeholder { color: #444; }
+.contact-input {
+  width: 100%; padding: 12px 14px;
+  background: var(--surface); border: 1px solid #252525;
+  border-radius: 10px; color: var(--white);
+  font-family: 'Outfit', sans-serif; font-size: 13px;
+  outline: none; margin-bottom: 8px;
+  transition: border-color 0.2s;
+}
+.contact-input:focus { border-color: var(--gold); }
+.contact-input::placeholder { color: #444; }
+.cta-btn {
+  width: 100%; padding: 13px;
+  background: var(--gold); border: none;
+  border-radius: 10px; color: var(--black);
+  font-family: 'Outfit', sans-serif; font-size: 13px;
+  font-weight: 500; letter-spacing: 0.04em;
+  transition: all 0.2s; margin-top: 10px;
+}
+.cta-btn:hover { background: var(--gold-light); }
+.cta-btn:disabled { opacity: 0.35; pointer-events: none; }
 
-  .choice-btn {
-    width: 100%;
-    padding: 14px 20px;
-    background: var(--surface);
-    border: 1px solid #333;
-    border-radius: 12px;
-    color: var(--white);
-    font-family: 'Outfit', sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    text-align: left;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+/* RIGHT PANEL */
+.quote-area {
+  flex: 1; display: flex; flex-direction: column;
+  justify-content: center; padding: 20px 0;
+}
+.quote-tag {
+  font-size: 9px; letter-spacing: 0.2em;
+  color: var(--gold); text-transform: uppercase;
+  margin-bottom: 14px; opacity: 0.8;
+  font-family: 'Outfit', sans-serif;
+}
+.quote-line { width: 28px; height: 1px; background: var(--gold); margin-bottom: 18px; opacity: 0.5; }
+.quote-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px; font-style: italic;
+  color: var(--gold); line-height: 1.65;
+  min-height: 90px;
+}
+.quote-author {
+  font-size: 10px; color: rgba(201,168,76,0.5);
+  margin-top: 12px; letter-spacing: 0.1em;
+  font-family: 'Outfit', sans-serif;
+}
+.cursor-blink {
+  display: inline-block; width: 1.5px; height: 16px;
+  background: var(--gold); vertical-align: middle;
+  margin-left: 1px; animation: blink 0.8s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
 
-  .choice-btn:hover {
-    border-color: var(--gold);
-    background: var(--surface2);
-    transform: translateX(4px);
-  }
+/* PROGRESS */
+.progress-area {
+  border-top: 1px solid rgba(201,168,76,0.12);
+  padding-top: 20px;
+}
+.prog-title {
+  font-size: 9px; letter-spacing: 0.15em;
+  color: rgba(201,168,76,0.5); text-transform: uppercase;
+  font-family: 'Outfit', sans-serif; margin-bottom: 12px;
+}
+.prog-steps { display: flex; flex-direction: column; gap: 7px; }
+.prog-step { display: flex; align-items: center; gap: 10px; font-size: 12px; font-family: 'Outfit', sans-serif; transition: all 0.3s; }
+.pdot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; transition: all 0.3s; }
+.pdot-done { background: var(--gold); }
+.pdot-active { background: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.18); }
+.pdot-todo { background: #222; border: 1px solid #333; }
+.ptext-done { color: rgba(201,168,76,0.4); }
+.ptext-active { color: var(--gold); }
+.ptext-todo { color: #2a2a2a; }
 
-  .choice-btn.selected {
-    border-color: var(--gold);
-    background: #1a1400;
-    color: var(--gold-light);
-  }
+/* TRANSITION BRIDGE */
+.bridge {
+  padding: 60px 40px;
+  max-width: 1200px; margin: 0 auto;
+  display: flex; align-items: center; gap: 40px;
+}
+.bridge-line { flex: 1; height: 1px; background: linear-gradient(to right, transparent, rgba(201,168,76,0.3), transparent); }
+.bridge-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px; font-style: italic;
+  color: var(--gray); text-align: center;
+  max-width: 320px; line-height: 1.6;
+}
 
-  /* CTA BUTTON */
-  .cta-btn {
-    width: 100%;
-    padding: 16px;
-    background: var(--gold);
-    border: none;
-    border-radius: 12px;
-    color: var(--black);
-    font-family: 'Outfit', sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    letter-spacing: 0.04em;
-    transition: all 0.2s ease;
-    margin-top: 14px;
-  }
+/* THANK YOU */
+.thankyou-wrap {
+  display: none; text-align: center;
+  padding: 80px 40px; max-width: 500px;
+  margin: 0 auto;
+}
+.thankyou-wrap.show { display: block; }
+.ty-icon { font-size: 36px; margin-bottom: 20px; }
+.ty-line { width: 36px; height: 1px; background: var(--gold); margin: 20px auto; }
+.ty-h { font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 300; line-height: 1.1; }
+.ty-p { color: var(--gray); font-size: 15px; line-height: 1.7; margin-top: 20px; }
 
-  .cta-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
-  .cta-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+/* TESTIMONIALS */
+.testimonials {
+  padding: 80px 40px;
+  max-width: 1200px; margin: 0 auto;
+}
+.test-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
+.test-card {
+  background: var(--surface); border: 1px solid #1e1e1e;
+  border-radius: 14px; padding: 28px 24px;
+  transition: border-color 0.3s;
+}
+.test-card:hover { border-color: rgba(201,168,76,0.2); }
+.test-quote { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-style: italic; color: #bbb; line-height: 1.65; margin-bottom: 20px; }
+.test-name { font-size: 12px; color: var(--gold); letter-spacing: 0.08em; }
+.test-role { font-size: 11px; color: var(--gray); margin-top: 2px; }
+.test-stars { color: var(--gold); font-size: 11px; margin-bottom: 12px; }
 
-  /* OPEN TEXT */
-  .open-textarea {
-    width: 100%;
-    padding: 14px 16px;
-    background: var(--surface);
-    border: 1px solid #333;
-    border-radius: 12px;
-    color: var(--white);
-    font-family: 'Outfit', sans-serif;
-    font-size: 14px;
-    resize: none;
-    height: 100px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
+/* FOOTER */
+footer {
+  border-top: 1px solid #141414;
+  padding: 40px;
+  display: flex; align-items: center;
+  justify-content: space-between;
+  max-width: 1200px; margin: 0 auto;
+}
+.footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 14px; letter-spacing: 0.25em; color: var(--gold); }
+.footer-links { display: flex; gap: 24px; }
+.footer-links a { font-size: 11px; color: #333; text-decoration: none; letter-spacing: 0.08em; transition: color 0.2s; }
+.footer-links a:hover { color: var(--gold); }
 
-  .open-textarea:focus { border-color: var(--gold); }
-  .open-textarea::placeholder { color: #555; }
-
-  /* CONTACT FORM */
-  .contact-input {
-    width: 100%;
-    padding: 14px 16px;
-    background: var(--surface);
-    border: 1px solid #333;
-    border-radius: 12px;
-    color: var(--white);
-    font-family: 'Outfit', sans-serif;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s;
-    margin-bottom: 10px;
-  }
-
-  .contact-input:focus { border-color: var(--gold); }
-  .contact-input::placeholder { color: #555; }
-
-  /* THANK YOU */
-  .thankyou-screen {
-    text-align: center;
-    padding: 0 24px;
-  }
-
-  .gold-line {
-    width: 40px;
-    height: 1px;
-    background: var(--gold);
-    margin: 20px auto;
-  }
-
-  .thankyou-screen h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 42px;
-    font-weight: 300;
-    color: var(--white);
-    line-height: 1.2;
-  }
-
-  .thankyou-screen p {
-    color: var(--gray);
-    font-size: 15px;
-    line-height: 1.7;
-    max-width: 320px;
-    margin: 0 auto;
-  }
-
-  .step-label {
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 16px;
-    text-align: center;
-  }
-
-  /* PLAY OVERLAY */
-  .play-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0,0,0,0.3);
-    cursor: pointer;
-    z-index: 2;
-    transition: opacity 0.3s;
-  }
-
-  .play-overlay.hidden { opacity: 0; pointer-events: none; }
-
-  .play-btn {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: var(--gold);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .play-btn svg { margin-left: 4px; }
-
-  /* INTRO SCREEN */
-  .intro-content { text-align: center; padding: 0 32px; }
-
-  .intro-content h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(36px, 8vw, 52px);
-    font-weight: 300;
-    line-height: 1.15;
-    margin-bottom: 16px;
-  }
-
-  .intro-content h1 em {
-    font-style: italic;
-    color: var(--gold);
-  }
-
-  .intro-content p {
-    color: var(--gray);
-    font-size: 15px;
-    line-height: 1.7;
-    max-width: 300px;
-    margin: 0 auto 32px;
-  }
-
-  .scroll-hint {
-    position: fixed;
-    bottom: 32px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    color: #444;
-    text-transform: uppercase;
-  }
+/* MOBILE */
+@media (max-width: 768px) {
+  .split-layout { grid-template-columns: 1fr; }
+  .split-right { display: none; }
+  .site-nav { display: none; }
+  .test-grid { grid-template-columns: 1fr; }
+  .bridge { flex-direction: column; gap: 16px; }
+  footer { flex-direction: column; gap: 20px; text-align: center; }
+}
 </style>
 </head>
 <body>
 
-<div class="progress-bar" id="progressBar" style="width: 0%"></div>
-<div class="logo">Rise Lab</div>
-
-<!-- INTRO -->
-<div class="screen active" id="screen-intro">
-  <div class="intro-content">
-    <h1>Studiare<br>non dovrebbe<br>essere una <em>lotta.</em></h1>
-    <p>Verdiana ti fa alcune domande. Ci vogliono 2 minuti.</p>
-    <button class="cta-btn" style="max-width:280px" onclick="goToStep(0)">Inizia →</button>
-  </div>
+<!-- CURSOR -->
+<div id="cursor">
+  <svg width="32" height="32" viewBox="0 0 32 32">
+    <circle cx="16" cy="16" r="13" fill="none" stroke="#C9A84C" stroke-width="1.5"/>
+    <circle cx="16" cy="16" r="3" fill="#C9A84C"/>
+  </svg>
 </div>
 
-<!-- STEP 0: CLIP 1 HOOK -->
-<div class="screen" id="screen-0">
-  <div class="step-label">Rise Lab · Verdiana</div>
-  <div class="video-wrap">
-    <iframe id="vid-0" src="https://www.youtube.com/embed/GFapoICvD7w?enablejsapi=1&rel=0&modestbranding=1" allowfullscreen allow="autoplay"></iframe>
+<!-- TOP PROGRESS -->
+<div class="top-bar"><div class="top-bar-fill" id="topBar"></div></div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="site-logo">Rise Lab</div>
+  <nav class="site-nav">
+    <a href="#verdiana">Studio</a>
+    <a href="#monia">Coaching</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Rise Lab — Verdiana & Monia Cupellini</div>
+  <h1>Non è una questione<br>di <em>volontà.</em></h1>
+  <p class="hero-sub">Spesso manca il metodo. O lo spazio per essere ascoltati davvero. Rispondi a qualche domanda — ci vogliono 3 minuti.</p>
+  <div class="hero-ctas">
+    <a href="#verdiana" class="btn-primary">Tecniche di studio →</a>
+    <a href="#monia" class="btn-secondary">Coaching Rise Lab →</a>
   </div>
-  <div class="form-area">
-    <button class="cta-btn" onclick="goToStep(1)">Continua →</button>
-  </div>
+  <div class="hero-scroll">Scorri</div>
+</section>
+
+<!-- ─── VERDIANA SECTION ─── -->
+<div class="section-divider" id="verdiana">
+  <div class="divider-line"></div>
+  <div class="divider-label">Verdiana — Tecniche di Studio</div>
+  <div class="divider-line"></div>
 </div>
 
-<!-- STEP 1: CLIP 2 CONOSCIAMOCI -->
-<div class="screen" id="screen-1">
-  <div class="step-label">1 di 5</div>
-  <div class="video-wrap">
-    <iframe id="vid-1" src="https://www.youtube.com/embed/i8tYrdGknSc?enablejsapi=1&rel=0&modestbranding=1" allowfullscreen allow="autoplay"></iframe>
+<section class="va-section">
+  <div class="va-intro">
+    <div class="va-tag">Per ragazzi e genitori</div>
+    <h2 class="va-title">Il metodo che<br>nessuno insegna.</h2>
+    <p class="va-desc">Verdiana ti fa alcune domande per capire da dove partire. Rispondi onestamente — non ci sono risposte giuste o sbagliate.</p>
   </div>
-  <div class="form-area">
-    <div class="choices">
-      <button class="choice-btn" onclick="selectChoice(this, 'chi', '🙋 Per me')">🙋 Per me</button>
-      <button class="choice-btn" onclick="selectChoice(this, 'chi', '👨‍👧 Per mio figlio')">👨‍👧 Per mio figlio</button>
-      <button class="choice-btn" onclick="selectChoice(this, 'chi', '📚 Sono un insegnante')">📚 Sono un insegnante</button>
+
+  <div class="split-layout">
+    <div class="split-left">
+      <div class="step-label" id="v-step-label">Rise Lab · Verdiana</div>
+      <div class="video-box">
+        <div class="video-loading" id="v-loading"><div class="video-loading-dot"></div></div>
+        <iframe id="v-iframe"
+          src="https://www.youtube-nocookie.com/embed/GFapoICvD7w?enablejsapi=1&rel=0&modestbranding=1&controls=1&playsinline=1"
+          allow="autoplay; encrypted-media" allowfullscreen
+          onload="document.getElementById('v-loading').style.display='none'">
+        </iframe>
+      </div>
+      <div class="answers-wrap" id="v-answers">
+        <!-- populated by JS -->
+      </div>
     </div>
-    <button class="cta-btn" id="btn-1" onclick="goToStep(2)" disabled>Continua →</button>
-  </div>
-</div>
-
-<!-- STEP 2: CLIP 3 LA SITUAZIONE -->
-<div class="screen" id="screen-2">
-  <div class="step-label">2 di 5</div>
-  <div class="video-wrap">
-    <iframe id="vid-2" src="https://www.youtube.com/embed/5lhe5UUagWc?enablejsapi=1&rel=0&modestbranding=1" allowfullscreen allow="autoplay"></iframe>
-  </div>
-  <div class="form-area">
-    <div class="choices">
-      <button class="choice-btn" onclick="selectChoice(this, 'situazione', '🌀 Non riesce a concentrarsi')">🌀 Non riesce a concentrarsi</button>
-      <button class="choice-btn" onclick="selectChoice(this, 'situazione', '🧠 Studia ma non ricorda niente')">🧠 Studia ma non ricorda niente</button>
-      <button class="choice-btn" onclick="selectChoice(this, 'situazione', '📖 Non vuole aprire un libro')">📖 Non vuole aprire un libro</button>
-      <button class="choice-btn" onclick="selectChoice(this, 'situazione', '😰 Si blocca sotto stress e ansia')">😰 Si blocca sotto stress e ansia</button>
-      <button class="choice-btn" onclick="selectChoice(this, 'situazione', '✨ È brillante ma i voti non lo dimostrano')">✨ È brillante ma i voti non lo dimostrano</button>
+    <div class="split-right">
+      <div class="quote-area">
+        <div class="quote-tag">Rise Lab</div>
+        <div class="quote-line"></div>
+        <div class="quote-text" id="v-quote"></div>
+        <div class="quote-author">— Monia Cupellini</div>
+      </div>
+      <div class="progress-area">
+        <div class="prog-title">Il tuo percorso</div>
+        <div class="prog-steps" id="v-progress"></div>
+      </div>
     </div>
-    <button class="cta-btn" id="btn-2" onclick="goToStep(3)" disabled>Continua →</button>
   </div>
+
+  <div class="thankyou-wrap" id="v-thankyou">
+    <div class="ty-icon">✦</div>
+    <div class="ty-line"></div>
+    <h2 class="ty-h">Grazie.<br>Riceverai<br>una risposta.</h2>
+    <div class="ty-line"></div>
+    <p class="ty-p">Abbiamo ricevuto le tue risposte. Ti contatteremo presto.<br><br><a href="#monia" style="color:var(--gold);text-decoration:none;font-size:13px;letter-spacing:0.08em">Scopri anche il percorso Rise Lab →</a></p>
+  </div>
+</section>
+
+<!-- BRIDGE -->
+<div class="bridge">
+  <div class="bridge-line"></div>
+  <div class="bridge-text">"Non è solo una questione di studio.<br>A volte si tratta di trovare il proprio posto."</div>
+  <div class="bridge-line"></div>
 </div>
 
-<!-- STEP 3: CLIP 4 I TENTATIVI -->
-<div class="screen" id="screen-3">
-  <div class="step-label">3 di 5</div>
-  <div class="video-wrap">
-    <iframe id="vid-3" src="https://www.youtube.com/embed/0Ic5YNPCiuo?enablejsapi=1&rel=0&modestbranding=1" allowfullscreen allow="autoplay"></iframe>
+<!-- ─── MONIA SECTION ─── -->
+<div class="section-divider" id="monia">
+  <div class="divider-line"></div>
+  <div class="divider-label">Monia Cupellini — Rise Lab Coaching</div>
+  <div class="divider-line"></div>
+</div>
+
+<section class="va-section">
+  <div class="va-intro">
+    <div class="va-tag">Percorso personale & familiare</div>
+    <h2 class="va-title">Essere ascoltati<br>cambia tutto.</h2>
+    <p class="va-desc">Monia ti fa alcune domande prima di risponderti. Non per darti una soluzione standard — per capire davvero la tua situazione.</p>
   </div>
-  <div class="form-area">
-    <div class="choices">
-      <button class="choice-btn" onclick="selectChoice(this, 'tentativi', '😕 Sì ma non ha funzionato')">😕 Sì ma non ha funzionato</button>
-      <button class="choice-btn" onclick="selectChoice(this, 'tentativi', '📝 Abbiamo provato ripetizioni')">📝 Abbiamo provato ripetizioni</button>
-      <button class="choice-btn" onclick="selectChoice(this, 'tentativi', '🤷 Non sapevo da dove iniziare')">🤷 Non sapevo da dove iniziare</button>
-      <button class="choice-btn" onclick="selectChoice(this, 'tentativi', '🌱 Prima volta che cerco aiuto')">🌱 Prima volta che cerco aiuto</button>
+
+  <div class="split-layout">
+    <div class="split-left">
+      <div class="step-label" id="m-step-label">Rise Lab · Monia</div>
+      <div class="video-box">
+        <div class="video-loading" id="m-loading"><div class="video-loading-dot"></div></div>
+        <iframe id="m-iframe"
+          src="https://www.youtube-nocookie.com/embed/RIf1Ex3YLBU?enablejsapi=1&rel=0&modestbranding=1&controls=1&playsinline=1"
+          allow="autoplay; encrypted-media" allowfullscreen
+          onload="document.getElementById('m-loading').style.display='none'">
+        </iframe>
+      </div>
+      <div class="answers-wrap" id="m-answers"></div>
     </div>
-    <button class="cta-btn" id="btn-3" onclick="goToStep(4)" disabled>Continua →</button>
+    <div class="split-right">
+      <div class="quote-area">
+        <div class="quote-tag">Rise Lab</div>
+        <div class="quote-line"></div>
+        <div class="quote-text" id="m-quote"></div>
+        <div class="quote-author">— Monia Cupellini</div>
+      </div>
+      <div class="progress-area">
+        <div class="prog-title">Il tuo percorso</div>
+        <div class="prog-steps" id="m-progress"></div>
+      </div>
+    </div>
   </div>
-</div>
 
-<!-- STEP 4: CLIP 5 DESIDERIO REALE -->
-<div class="screen" id="screen-4">
-  <div class="step-label">4 di 5</div>
-  <div class="video-wrap">
-    <iframe id="vid-4" src="https://www.youtube.com/embed/JOuEh9OAsVU?enablejsapi=1&rel=0&modestbranding=1" allowfullscreen allow="autoplay"></iframe>
+  <div class="thankyou-wrap" id="m-thankyou">
+    <div class="ty-icon">✦</div>
+    <div class="ty-line"></div>
+    <h2 class="ty-h">Grazie.<br>Ti risponde<br>Monia.</h2>
+    <div class="ty-line"></div>
+    <p class="ty-p">Monia ha ricevuto le tue risposte e ti contatterà di persona nelle prossime ore.</p>
   </div>
-  <div class="form-area">
-    <textarea class="open-textarea" id="desiderio" placeholder="Scrivimi qui..." oninput="checkTextarea('desiderio', 'btn-4')"></textarea>
-    <button class="cta-btn" id="btn-4" onclick="goToStep(5)" disabled>Continua →</button>
-  </div>
-</div>
+</section>
 
-<!-- STEP 5: CLIP 6 CONTATTO -->
-<div class="screen" id="screen-5">
-  <div class="step-label">5 di 5</div>
-  <div class="video-wrap">
-    <iframe id="vid-5" src="https://www.youtube.com/embed/uQKUZxJKPY0?enablejsapi=1&rel=0&modestbranding=1" allowfullscreen allow="autoplay"></iframe>
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="section-divider" style="padding:0;margin-bottom:40px;">
+    <div class="divider-line"></div>
+    <div class="divider-label">Chi ha già intrapreso il percorso</div>
+    <div class="divider-line"></div>
   </div>
-  <div class="form-area">
-    <input type="text" class="contact-input" id="nome" placeholder="Il tuo nome" oninput="checkContact()">
-    <input type="text" class="contact-input" id="contatto" placeholder="Numero di telefono o email" oninput="checkContact()">
-    <button class="cta-btn" id="btn-5" onclick="submitForm()" disabled>Invia →</button>
+  <div class="test-grid">
+    <div class="test-card">
+      <div class="test-stars">★★★★★</div>
+      <div class="test-quote">"Finalmente qualcuno che ha ascoltato mio figlio senza giudicarlo. In poche settimane è cambiato qualcosa di profondo."</div>
+      <div class="test-name">Laura M.</div>
+      <div class="test-role">Mamma, Brescia</div>
+    </div>
+    <div class="test-card">
+      <div class="test-stars">★★★★★</div>
+      <div class="test-quote">"Non pensavo che un metodo di studio potesse cambiare così tanto. Adesso studio meno ore ma ricordo tutto."</div>
+      <div class="test-name">Matteo R.</div>
+      <div class="test-role">Studente, 16 anni</div>
+    </div>
+    <div class="test-card">
+      <div class="test-stars">★★★★★</div>
+      <div class="test-quote">"Monia parla un linguaggio diverso. Non promesse, non formule. Presenza vera. È la prima cosa che ha funzionato davvero."</div>
+      <div class="test-name">Federica T.</div>
+      <div class="test-role">Genitore, Milano</div>
+    </div>
   </div>
-</div>
+</section>
 
-<!-- THANK YOU -->
-<div class="screen" id="screen-thankyou">
-  <div class="thankyou-screen">
-    <div style="font-size:32px">✦</div>
-    <div class="gold-line"></div>
-    <h1>Grazie.<br>Ti risponde<br>Monia.</h1>
-    <div class="gold-line"></div>
-    <p>Abbiamo ricevuto le tue risposte. Monia ti contatterà personalmente nelle prossime ore.</p>
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Rise Lab</div>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Cookie</a>
+    <a href="#">Instagram</a>
   </div>
-</div>
+</footer>
 
 <script>
-  let currentStep = -1;
-  const totalSteps = 6;
-  const answers = {};
+// CURSOR
+document.addEventListener('mousemove', e => {
+  const c = document.getElementById('cursor');
+  c.style.left = e.clientX + 'px';
+  c.style.top = e.clientY + 'px';
+});
 
-  function goToStep(step) {
-    const prev = currentStep === -1 ? 'intro' : currentStep;
-    document.getElementById(currentStep === -1 ? 'screen-intro' : `screen-${currentStep}`).classList.remove('active');
-    currentStep = step;
-    document.getElementById(`screen-${step}`).classList.add('active');
-    const progress = ((step + 1) / (totalSteps + 1)) * 100;
-    document.getElementById('progressBar').style.width = progress + '%';
+// ── DATA ──
+const VERDIANA = {
+  videos: ['GFapoICvD7w','i8tYrdGknSc','5lhe5UUagWc','0Ic5YNPCiuo','JOuEh9OAsVU','uQKUZxJKPY0'],
+  quotes: [
+    "Studiare non è una questione di volontà. È una questione di metodo.",
+    "Il cervello non dimentica ciò che capisce davvero.",
+    "La concentrazione si allena. Come un muscolo.",
+    "Sbagliare fa parte del processo. Bloccarsi, no.",
+    "Il metodo giusto trasforma la fatica in risultato.",
+    "Il cambiamento inizia da una domanda onesta."
+  ],
+  steps: ['Chi sei','La situazione','I tentativi','Il desiderio','Contatto'],
+  answers: [
+    { type: 'button', label: 'Continua →' },
+    { type: 'choice', key: 'chi', options: ['🙋 Per me','👨‍👧 Per mio figlio','📚 Sono un insegnante'] },
+    { type: 'choice', key: 'situazione', options: ['🌀 Non riesce a concentrarsi','🧠 Studia ma non ricorda niente','📖 Non vuole aprire un libro','😰 Si blocca sotto stress e ansia','✨ È brillante ma i voti non lo dimostrano'] },
+    { type: 'choice', key: 'tentativi', options: ['😕 Sì ma non ha funzionato','📝 Abbiamo provato ripetizioni','🤷 Non sapevo da dove iniziare','🌱 Prima volta che cerco aiuto'] },
+    { type: 'text', key: 'desiderio', placeholder: 'Scrivimi qui...' },
+    { type: 'contact' }
+  ]
+};
+
+const MONIA = {
+  videos: ['RIf1Ex3YLBU','mPcVT4fjzGk','USeKLkhkraI','TOMezPEknwg','lGTcLLHlQ7Q','68uoDEVc1gM','T7oprrrBaPA','NuudjmVAv_0',['z-bZeUX5_GQ','oSuIuTNFhP0']],
+  quotes: [
+    "La cicatrice è il curriculum.",
+    "Non serve correggere. Serve ascoltare.",
+    "Il disagio ha sempre qualcosa da dire.",
+    "La relazione viene prima della tecnica.",
+    "Profondità prima della semplificazione.",
+    "Nessuno è fuori posto. È il posto che è sbagliato.",
+    "Essere visti cambia tutto.",
+    "La presenza è già una risposta.",
+    "Il cambiamento non si promette. Si costruisce."
+  ],
+  steps: ['Chi sei','Il contesto','La difficoltà','Da quanto','I tentativi','Cosa no','Il cambiamento','Contatto'],
+  answers: [
+    { type: 'button', label: 'Continua →' },
+    { type: 'choice', key: 'chi', options: ['🙋 Sono un genitore','👦 Sono un ragazzo/a','📚 Sono un insegnante'] },
+    { type: 'choice', key: 'contesto', options: ['🏠 A casa, con mio figlio','🏫 A scuola, con i miei studenti','🧭 Nella mia vita personale','🌐 Un po\' ovunque'] },
+    { type: 'choice', key: 'difficolta', options: ['💬 Non riesco a comunicare con mio figlio','🚪 Si chiude, non mi fa entrare','⚡ È oppositivo e non capisco perché','📉 A scuola va male ma non è stupido','🤍 Mi sento solo/a in tutto questo','🔄 Non so più da dove ricominciare'] },
+    { type: 'choice', key: 'durata', options: ['📅 Da qualche mese','🗓️ Da più di un anno','⏳ Da così tanto che non ricordo','⚠️ È recente ma sta già pesando'] },
+    { type: 'choice', key: 'tentativi', options: ['🧠 Ho cercato supporto psicologico','📝 Abbiamo provato percorsi scolastici','📖 Ho letto, mi sono informato/a','💬 Ho provato a parlare ma non funziona','🌱 Non sapevo da dove iniziare'] },
+    { type: 'text', key: 'nonVuole', placeholder: 'Cosa non vuoi più sentire o fare...' },
+    { type: 'text', key: 'cambiamento', placeholder: 'Anche solo un primo passo concreto...' },
+    { type: 'contact' }
+  ]
+};
+
+// ── STATE ──
+const state = {
+  v: { step: 0, answers: {}, videoEnded: false },
+  m: { step: 0, answers: {}, videoEnded: false }
+};
+
+// ── YOUTUBE API ──
+const players = {};
+window.onYouTubeIframeAPIReady = function() {
+  players.v = new YT.Player('v-iframe', {
+    events: { onStateChange: e => onVideoState('v', e.data) }
+  });
+  players.m = new YT.Player('m-iframe', {
+    events: { onStateChange: e => onVideoState('m', e.data) }
+  });
+};
+
+function onVideoState(id, s) {
+  if (s === YT.PlayerState.ENDED) {
+    const st = state[id];
+    // Check if Monia clip 9 has two parts
+    if (id === 'm') {
+      const vid = MONIA.videos[st.step];
+      if (Array.isArray(vid) && !st.part2played) {
+        st.part2played = true;
+        players.m.loadVideoById(vid[1]);
+        players.m.playVideo();
+        return;
+      }
+    }
+    st.videoEnded = true;
+    showAnswers(id);
+  }
+}
+
+function showAnswers(id) {
+  document.getElementById(id + '-answers').classList.add('visible');
+}
+
+// ── RENDER ANSWERS ──
+function renderAnswers(id) {
+  const data = id === 'v' ? VERDIANA : MONIA;
+  const st = state[id];
+  const wrap = document.getElementById(id + '-answers');
+  const cfg = data.answers[st.step];
+  wrap.classList.remove('visible');
+  wrap.innerHTML = '';
+  st.videoEnded = false;
+  if (id === 'm') st.part2played = false;
+
+  if (cfg.type === 'button') {
+    const btn = document.createElement('button');
+    btn.className = 'cta-btn';
+    btn.textContent = cfg.label;
+    btn.onclick = () => nextStep(id);
+    wrap.appendChild(btn);
+    // For hook, show after 2s
+    setTimeout(() => wrap.classList.add('visible'), 2000);
+    return;
   }
 
-  function selectChoice(btn, field, value) {
-    const group = btn.closest('.choices').querySelectorAll('.choice-btn');
-    group.forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    answers[field] = value;
-    const stepNum = btn.closest('.screen').id.split('-')[1];
-    const cta = document.getElementById(`btn-${stepNum}`);
-    if (cta) cta.disabled = false;
+  if (cfg.type === 'choice') {
+    const div = document.createElement('div');
+    div.className = 'choices';
+    cfg.options.forEach(opt => {
+      const b = document.createElement('button');
+      b.className = 'choice-btn';
+      b.textContent = opt;
+      b.onclick = () => {
+        div.querySelectorAll('.choice-btn').forEach(x => x.classList.remove('selected'));
+        b.classList.add('selected');
+        st.answers[cfg.key] = opt;
+        cta.disabled = false;
+      };
+      div.appendChild(b);
+    });
+    wrap.appendChild(div);
+    const cta = document.createElement('button');
+    cta.className = 'cta-btn';
+    cta.textContent = 'Continua →';
+    cta.disabled = true;
+    cta.onclick = () => nextStep(id);
+    wrap.appendChild(cta);
+    return;
   }
 
-  function checkTextarea(id, btnId) {
-    const val = document.getElementById(id).value.trim();
-    answers['desiderio'] = val;
-    document.getElementById(btnId).disabled = val.length < 3;
+  if (cfg.type === 'text') {
+    const ta = document.createElement('textarea');
+    ta.className = 'open-textarea';
+    ta.placeholder = cfg.placeholder;
+    ta.oninput = () => {
+      st.answers[cfg.key] = ta.value;
+      cta.disabled = ta.value.trim().length < 3;
+    };
+    wrap.appendChild(ta);
+    const cta = document.createElement('button');
+    cta.className = 'cta-btn';
+    cta.textContent = 'Continua →';
+    cta.disabled = true;
+    cta.onclick = () => nextStep(id);
+    wrap.appendChild(cta);
+    return;
   }
 
-  function checkContact() {
-    const nome = document.getElementById('nome').value.trim();
-    const contatto = document.getElementById('contatto').value.trim();
-    answers['nome'] = nome;
-    answers['contatto'] = contatto;
-    document.getElementById('btn-5').disabled = !(nome.length > 1 && contatto.length > 4);
+  if (cfg.type === 'contact') {
+    const n = document.createElement('input');
+    n.type = 'text'; n.className = 'contact-input';
+    n.placeholder = 'Il tuo nome';
+    const c = document.createElement('input');
+    c.type = 'text'; c.className = 'contact-input';
+    c.placeholder = 'Numero di telefono o email';
+    const check = () => {
+      st.answers.nome = n.value;
+      st.answers.contatto = c.value;
+      cta.disabled = !(n.value.trim().length > 1 && c.value.trim().length > 4);
+    };
+    n.oninput = check; c.oninput = check;
+    wrap.appendChild(n); wrap.appendChild(c);
+    const cta = document.createElement('button');
+    cta.className = 'cta-btn';
+    cta.textContent = 'Invia →';
+    cta.disabled = true;
+    cta.onclick = () => submitForm(id);
+    wrap.appendChild(cta);
+    return;
+  }
+}
+
+// ── NEXT STEP ──
+function nextStep(id) {
+  const data = id === 'v' ? VERDIANA : MONIA;
+  const st = state[id];
+  st.step++;
+  if (st.step >= data.videos.length) return;
+
+  // Load video
+  const vid = data.videos[st.step];
+  const videoId = Array.isArray(vid) ? vid[0] : vid;
+  if (players[id] && players[id].loadVideoById) {
+    players[id].loadVideoById(videoId);
+  } else {
+    const src = `https://www.youtube-nocookie.com/embed/${videoId}?enablejsapi=1&rel=0&modestbranding=1&controls=1&playsinline=1&autoplay=1`;
+    document.getElementById(id + '-iframe').src = src;
   }
 
-  function submitForm() {
-    document.getElementById('screen-5').classList.remove('active');
-    document.getElementById('screen-thankyou').classList.add('active');
-    document.getElementById('progressBar').style.width = '100%';
-    sendToSheet(answers);
-  }
+  // Step label
+  const labels = id === 'v'
+    ? ['Rise Lab · Verdiana','1 di 5','2 di 5','3 di 5','4 di 5','5 di 5']
+    : ['Rise Lab · Monia','1 di 8','2 di 8','3 di 8','4 di 8','5 di 8','6 di 8','7 di 8','8 di 8'];
+  document.getElementById(id + '-step-label').textContent = labels[st.step] || '';
 
-  function sendToSheet(data) {
-    const SHEET_URL = 'INSERISCI_QUI_URL_GOOGLE_APPS_SCRIPT';
-    if (SHEET_URL.includes('INSERISCI')) return;
-    fetch(SHEET_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    }).catch(() => {});
-  }
+  // Quote
+  typeQuote(id, data.quotes[st.step] || '');
+
+  // Progress
+  buildProgress(id);
+
+  // Top bar
+  const total = id === 'v' ? 6 : 9;
+  document.getElementById('topBar').style.width = ((st.step / total) * 100) + '%';
+
+  // Answers
+  renderAnswers(id);
+}
+
+// ── SUBMIT ──
+function submitForm(id) {
+  const st = state[id];
+  document.getElementById(id + '-answers').classList.remove('visible');
+  const layout = document.querySelector(id === 'v' ? '#verdiana .split-layout' : '#monia .split-layout');
+  layout.style.display = 'none';
+  document.getElementById(id + '-thankyou').classList.add('show');
+  document.getElementById('topBar').style.width = '100%';
+  sendToSheet(id, st.answers);
+}
+
+function sendToSheet(id, data) {
+  const url = 'INSERISCI_URL_GOOGLE_APPS_SCRIPT';
+  if (url.includes('INSERISCI')) return;
+  fetch(url, { method: 'POST', mode: 'no-cors', headers: {'Content-Type':'application/json'}, body: JSON.stringify({source: id, ...data}) }).catch(()=>{});
+}
+
+// ── QUOTE TYPEWRITER ──
+let typingTimers = {};
+function typeQuote(id, text) {
+  clearTimeout(typingTimers[id]);
+  const el = document.getElementById(id + '-quote');
+  el.style.transition = 'opacity 0.4s';
+  el.style.opacity = '0';
+  setTimeout(() => {
+    el.style.opacity = '1';
+    el.textContent = '';
+    let i = 0;
+    const cur = document.createElement('span');
+    cur.className = 'cursor-blink';
+    el.appendChild(cur);
+    const iv = setInterval(() => {
+      if (i < text.length) { el.insertBefore(document.createTextNode(text[i]), cur); i++; }
+      else { clearInterval(iv); setTimeout(() => cur.remove(), 800); }
+    }, 26);
+  }, 420);
+}
+
+// ── PROGRESS ──
+function buildProgress(id) {
+  const data = id === 'v' ? VERDIANA : MONIA;
+  const st = state[id];
+  const el = document.getElementById(id + '-progress');
+  el.innerHTML = '';
+  data.steps.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'prog-step';
+    const dot = document.createElement('div');
+    const idx = st.step - 1;
+    dot.className = 'pdot ' + (i < idx ? 'pdot-done' : i === idx ? 'pdot-active' : 'pdot-todo');
+    const span = document.createElement('span');
+    span.className = i < idx ? 'ptext-done' : i === idx ? 'ptext-active' : 'ptext-todo';
+    span.textContent = s;
+    div.appendChild(dot); div.appendChild(span);
+    el.appendChild(div);
+  });
+}
+
+// ── INIT ──
+function init() {
+  // Initial quotes
+  typeQuote('v', VERDIANA.quotes[0]);
+  typeQuote('m', MONIA.quotes[0]);
+  buildProgress('v');
+  buildProgress('m');
+
+  // Initial answers (show after 2s for hook)
+  renderAnswers('v');
+  renderAnswers('m');
+
+  // Load YouTube API
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+}
+
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
