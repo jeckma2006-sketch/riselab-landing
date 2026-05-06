@@ -96,8 +96,8 @@ body.unlocked { overflow-y: auto; overflow-x: hidden; }
 .yt-mask-right { top: 0; right: 0; width: 55px; height: 100%; }
 .yt-mask-left { top: 0; left: 0; width: 8px; height: 100%; }
 
-/* Iframe offset to hide YT chrome - fills box fully */
-.video-box iframe { position: absolute; top: -8%; left: -1%; width: 102%; height: 116%; }
+/* Iframe fills box fully */
+.video-box iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
 
 .video-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #0d0d0d; z-index: 4; }
 .loading-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); animation: pulse 1.2s ease-in-out infinite; }
@@ -118,7 +118,11 @@ body.unlocked { overflow-y: auto; overflow-x: hidden; }
 .contact-input::placeholder { color: #333; }
 .cta-btn { width: 100%; padding: 14px; background: var(--gold); border: none; border-radius: 10px; color: var(--black); font-family: 'Outfit',sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0.05em; transition: all 0.2s; margin-top: 12px; cursor: none; }
 .cta-btn:hover { background: var(--gold-light); }
-.cta-btn:disabled { opacity: 0.3; pointer-events: none; }
+.back-btn { display: none; align-items: center; gap: 6px; background: none; border: none; color: rgba(201,168,76,0.5); font-family: 'Outfit',sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: none; padding: 0; transition: color 0.2s; }
+.back-btn:hover { color: var(--gold); }
+.back-btn.visible { display: flex; }
+.back-btn svg { transition: transform 0.2s; }
+.back-btn:hover svg { transform: translateX(-3px); }
 
 /* RIGHT PANEL */
 .split-right { padding: 48px 40px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
@@ -296,10 +300,14 @@ body.unlocked { overflow-y: auto; overflow-x: hidden; }
           <div class="yt-mask yt-mask-right"></div>
           <div class="yt-mask yt-mask-left"></div>
           <iframe id="v-iframe"
-            src="about:blank"
+            src="https://www.youtube-nocookie.com/embed/GFapoICvD7w?enablejsapi=1&rel=0&modestbranding=1&controls=0&playsinline=1&iv_load_policy=3&fs=0"
             allow="autoplay; encrypted-media" allowfullscreen>
           </iframe>
         </div>
+        <button class="back-btn" id="v-back" onclick="prevStep('v')">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Domanda precedente
+        </button>
         <div class="answers-wrap" id="v-answers"></div>
       </div>
       <div class="split-right">
@@ -352,10 +360,14 @@ body.unlocked { overflow-y: auto; overflow-x: hidden; }
           <div class="yt-mask yt-mask-right"></div>
           <div class="yt-mask yt-mask-left"></div>
           <iframe id="m-iframe"
-            src="about:blank"
+            src="https://www.youtube-nocookie.com/embed/RIf1Ex3YLBU?enablejsapi=1&rel=0&modestbranding=1&controls=0&playsinline=1&iv_load_policy=3&fs=0"
             allow="autoplay; encrypted-media" allowfullscreen>
           </iframe>
         </div>
+        <button class="back-btn" id="m-back" onclick="prevStep('m')">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Domanda precedente
+        </button>
         <div class="answers-wrap" id="m-answers"></div>
       </div>
       <div class="split-right">
@@ -515,10 +527,36 @@ function startVideo(id, e) {
     setTimeout(()=>{
       vr.style.transition='opacity 0.4s'; vr.style.opacity='0';
       document.getElementById(id+'-play').style.display='none';
-      loadIframe(id, DATA[id].videos[0]);
+      // Use YT player API to play (iframe already loaded)
+      if (players[id] && players[id].playVideo) {
+        players[id].playVideo();
+      } else {
+        // Fallback: reload with autoplay
+        document.getElementById(id+'-iframe').src =
+          `https://www.youtube-nocookie.com/embed/${DATA[id].videos[0]}?enablejsapi=1&rel=0&modestbranding=1&controls=0&playsinline=1&iv_load_policy=3&fs=0&autoplay=1`;
+      }
+      document.getElementById(id+'-loading').style.display='none';
       setTimeout(()=>{ vr.style.display='none'; vr.style.opacity='1'; },500);
     },650);
   });
+}
+
+// ── PREV STEP ──
+function prevStep(id) {
+  const st = state[id];
+  if (st.step <= 0) return;
+  st.step--;
+  const vid = DATA[id].videos[st.step];
+  const vidId = Array.isArray(vid) ? vid[0] : vid;
+  if (players[id] && players[id].loadVideoById) { players[id].loadVideoById(vidId); }
+  else { document.getElementById(id+'-iframe').src=`https://www.youtube-nocookie.com/embed/${vidId}?enablejsapi=1&rel=0&modestbranding=1&controls=0&playsinline=1&iv_load_policy=3&fs=0&autoplay=1`; }
+  const labels=id==='v'?['Rise Lab · Verdiana','1 di 5','2 di 5','3 di 5','4 di 5','5 di 5']:['Rise Lab · Monia','1 di 8','2 di 8','3 di 8','4 di 8','5 di 8','6 di 8','7 di 8','8 di 8'];
+  document.getElementById(id+'-step-label').textContent=labels[st.step]||'';
+  typeQuote(id, DATA[id].quotes[st.step]||'');
+  buildProgress(id);
+  document.getElementById('topBar').style.width=((st.step/(id==='v'?6:9))*100)+'%';
+  renderAnswers(id);
+  updateBackBtn(id);
 }
 
 // ── LOAD IFRAME ──
@@ -618,9 +656,15 @@ function nextStep(id) {
   buildProgress(id);
   document.getElementById('topBar').style.width=((st.step/(id==='v'?6:9))*100)+'%';
   renderAnswers(id);
+  updateBackBtn(id);
 }
 
-// ── SUBMIT ──
+function updateBackBtn(id) {
+  const btn = document.getElementById(id+'-back');
+  if (!btn) return;
+  if (state[id].step > 0) btn.classList.add('visible');
+  else btn.classList.remove('visible');
+}
 function submitForm(id) {
   document.getElementById(id+'-layout').style.display='none';
   document.getElementById(id+'-thankyou').classList.add('show');
