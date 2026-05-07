@@ -56,9 +56,11 @@ html,body{background:var(--black);color:var(--white);font-family:'Barlow',sans-s
 .hero-pills{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:36px;}
 .pill{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:6px 14px;border-radius:2px;border:1px solid rgba(255,255,255,0.15);color:var(--light-gray);}
 .pill.accent{border-color:var(--orange);color:var(--orange);background:var(--orange-dim);}
-.hero-cta{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;padding:16px 48px;background:var(--orange);color:var(--black);border:none;border-radius:2px;cursor:none;transition:background 0.2s,transform 0.15s;}
+.hero-cta{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;padding:16px 36px;background:var(--orange);color:var(--black);border:none;border-radius:2px;cursor:none;transition:background 0.2s,transform 0.15s,box-shadow 0.2s;display:inline-flex;align-items:center;gap:12px;box-shadow:0 6px 20px rgba(255,122,0,0.25);}
 @media(max-width:860px){.hero-cta{cursor:pointer;}}
-.hero-cta:hover{background:#FF8C20;transform:translateY(-2px);}
+.hero-cta:hover{background:#FF8C20;transform:translateY(-2px);box-shadow:0 10px 28px rgba(255,122,0,0.4);}
+.hero-cta-arrow{animation:bounceDown 1.6s ease-in-out infinite;flex-shrink:0;}
+@keyframes bounceDown{0%,100%{transform:translateY(0);}50%{transform:translateY(4px);}}
 .hero-cta-sub{font-size:12px;color:#555;letter-spacing:0.1em;text-transform:uppercase;margin-top:10px;}
 
 /* PROBLEMS */
@@ -113,36 +115,39 @@ html,body{background:var(--black);color:var(--white);font-family:'Barlow',sans-s
   position:relative;flex-shrink:0;overflow:hidden;
 }
 
-/* CORNICE ARANCIONE INTERNA — nasconde lo spazio nero tra video e bordo */
-.video-frame-deco{
-  position:absolute;
-  inset:8px;
-  border:1px solid rgba(255,122,0,0.45);
-  border-radius:2px;
-  pointer-events:none;
-  z-index:7;
-}
-.video-frame-deco::before,
-.video-frame-deco::after{
-  content:'';
+/* CORNICE ARANCIONE — 4 LINEE DENTRO LO SPAZIO NERO tra bordo riquadro e video */
+/* Lo spazio nero è creato dalle yt-mask (top 52, bottom 68, right 56, left 4) */
+/* Posiziono 4 linee sottili a metà di ogni mask */
+.frame-line{
   position:absolute;
   background:var(--orange);
-  box-shadow:0 0 8px rgba(255,122,0,0.6);
+  box-shadow:0 0 6px rgba(255,122,0,0.5);
+  z-index:8;
+  pointer-events:none;
 }
-.video-frame-deco::before{
-  top:-1px;left:50%;transform:translateX(-50%);
-  width:40px;height:2px;
+/* Linea TOP: a metà dello spazio nero superiore (52px / 2 = 26px) */
+.frame-line-top{
+  top:26px;
+  left:24px;right:24px;
+  height:1px;
 }
-.video-frame-deco::after{
-  bottom:-1px;left:50%;transform:translateX(-50%);
-  width:40px;height:2px;
+/* Linea BOTTOM: a metà dello spazio nero inferiore (68px / 2 = 34px) */
+.frame-line-bottom{
+  bottom:34px;
+  left:24px;right:24px;
+  height:1px;
 }
-/* Angoli decorativi */
-.frame-corner{position:absolute;width:14px;height:14px;border:1.5px solid var(--orange);z-index:7;pointer-events:none;}
-.frame-corner.tl{top:4px;left:4px;border-right:none;border-bottom:none;}
-.frame-corner.tr{top:4px;right:4px;border-left:none;border-bottom:none;}
-.frame-corner.bl{bottom:4px;left:4px;border-right:none;border-top:none;}
-.frame-corner.br{bottom:4px;right:4px;border-left:none;border-top:none;}
+/* Linea RIGHT: a metà dello spazio nero destro (56px / 2 = 28px) */
+.frame-line-right{
+  right:28px;
+  top:60px;bottom:76px;
+  width:1px;
+}
+/* Linea LEFT: NON la metto a sinistra perché lo spazio è solo 4px (troppo poco) */
+/* Angoli decorativi nei 3 corner che hanno spazio */
+.frame-corner{position:absolute;width:12px;height:12px;border:1.5px solid var(--orange);z-index:8;pointer-events:none;box-shadow:0 0 6px rgba(255,122,0,0.4);}
+.frame-corner.tr{top:18px;right:20px;border-left:none;border-bottom:none;}
+.frame-corner.br{bottom:26px;right:20px;border-left:none;border-top:none;}
 
 /* PLAY SCREEN */
 .play-screen{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#0a0a0a;cursor:none;}
@@ -170,6 +175,24 @@ html,body{background:var(--black);color:var(--white);font-family:'Barlow',sans-s
 }
 .video-block-overlay{position:absolute;inset:0;z-index:6;cursor:none;}
 @media(max-width:860px){.video-block-overlay{cursor:pointer;}}
+
+/* PAUSE OVERLAY — copre il big play button di YouTube quando in pausa */
+.pause-overlay{
+  position:absolute;inset:0;z-index:7;
+  background:rgba(10,10,10,0.55);
+  backdrop-filter:blur(2px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.3s ease;
+}
+.pause-overlay.visible{opacity:1;}
+.pause-overlay-icon{
+  width:64px;height:64px;border-radius:50%;
+  background:rgba(255,122,0,0.15);
+  border:1.5px solid var(--orange);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 20px rgba(255,122,0,0.3);
+}
 
 /* YT MASKS */
 .yt-mask{position:absolute;background:#0d0d0d;z-index:5;}
@@ -465,8 +488,13 @@ html,body{background:var(--black);color:var(--white);font-family:'Barlow',sans-s
     <span class="pill">Scuole medie & superiori</span>
     <span class="pill accent">Max 6 studenti</span>
   </div>
-  <button class="hero-cta" onclick="scrollToVideoAsk()">PRENOTA IL TUO POSTO →</button>
-  <p class="hero-cta-sub">Posti limitati — non aspettare</p>
+  <button class="hero-cta" onclick="scrollToVideoAsk()">
+    <span>FATTI RACCONTARE COME FUNZIONA</span>
+    <svg class="hero-cta-arrow" width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M9 3v10M5 9l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <p class="hero-cta-sub">Verdiana ti spiega tutto in 3 minuti</p>
 </section>
 
 <!-- PROBLEMS -->
@@ -543,11 +571,11 @@ html,body{background:var(--black);color:var(--white);font-family:'Barlow',sans-s
       <div class="step-label" id="v-step-label">Rise Lab · Verdiana</div>
 
       <div class="video-box" id="v-box">
-        <!-- Cornice arancione decorativa -->
-        <div class="video-frame-deco"></div>
-        <div class="frame-corner tl"></div>
+        <!-- Cornice arancione decorativa NELLO SPAZIO NERO tra bordo e video -->
+        <div class="frame-line frame-line-top"></div>
+        <div class="frame-line frame-line-bottom"></div>
+        <div class="frame-line frame-line-right"></div>
         <div class="frame-corner tr"></div>
-        <div class="frame-corner bl"></div>
         <div class="frame-corner br"></div>
 
         <!-- Play screen -->
@@ -569,6 +597,16 @@ html,body{background:var(--black);color:var(--white);font-family:'Barlow',sans-s
 
         <!-- Block overlay -->
         <div class="video-block-overlay" id="v-block"></div>
+
+        <!-- PAUSE OVERLAY — nasconde il big play button di YouTube quando in pausa -->
+        <div class="pause-overlay" id="v-pause-overlay">
+          <div class="pause-overlay-icon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <rect x="6" y="4" width="3" height="14" fill="#FF7A00"/>
+              <rect x="13" y="4" width="3" height="14" fill="#FF7A00"/>
+            </svg>
+          </div>
+        </div>
 
         <!-- Iframe -->
         <iframe id="v-iframe" src="https://www.youtube-nocookie.com/embed/GFapoICvD7w?enablejsapi=1&rel=0&modestbranding=1&controls=0&playsinline=1&iv_load_policy=3&fs=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
@@ -839,9 +877,23 @@ window.onYouTubeIframeAPIReady=function(){
 
 function onVidState(id,s){
   // 1 = playing, 2 = paused, 0 = ended
-  if(s===1){state[id].playing=true;updatePPIcon(id);document.getElementById(id+'-controls').classList.add('visible');}
-  if(s===2){state[id].playing=false;updatePPIcon(id);}
-  if(s===0){state[id].playing=false;showAnswerOverlay(id);}
+  const pauseOv=document.getElementById(id+'-pause-overlay');
+  if(s===1){
+    state[id].playing=true;
+    updatePPIcon(id);
+    document.getElementById(id+'-controls').classList.add('visible');
+    if(pauseOv)pauseOv.classList.remove('visible');
+  }
+  if(s===2){
+    state[id].playing=false;
+    updatePPIcon(id);
+    if(pauseOv)pauseOv.classList.add('visible');
+  }
+  if(s===0){
+    state[id].playing=false;
+    if(pauseOv)pauseOv.classList.remove('visible');
+    showAnswerOverlay(id);
+  }
 }
 
 // ── PLAY / PAUSE ──
