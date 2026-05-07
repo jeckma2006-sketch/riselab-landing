@@ -336,6 +336,9 @@ html,body{background:var(--black);color:var(--white);font-family:'Barlow',sans-s
 .ty-h{font-family:'Barlow Condensed',sans-serif;font-size:clamp(40px,6vw,64px);font-weight:900;text-transform:uppercase;line-height:0.95;}
 .ty-h span{color:var(--orange);}
 .ty-p{color:var(--light-gray);font-size:16px;line-height:1.7;margin-top:20px;}
+.ty-wa-btn{display:inline-flex;align-items:center;gap:12px;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;padding:16px 32px;background:#25D366;color:var(--black);text-decoration:none;border-radius:2px;margin-top:24px;cursor:none;transition:transform 0.15s,background 0.2s,box-shadow 0.2s;box-shadow:0 6px 20px rgba(37,211,102,0.3);}
+@media(max-width:860px){.ty-wa-btn{cursor:pointer;}}
+.ty-wa-btn:hover{background:#2ee474;transform:translateY(-2px);box-shadow:0 10px 28px rgba(37,211,102,0.5);}
 
 /* SOCIAL PROOF */
 .social-proof{background:var(--surface);border-top:1px solid #1e1e1e;padding:70px 40px;}
@@ -676,7 +679,15 @@ html,body{background:var(--black);color:var(--white);font-family:'Barlow',sans-s
     <div class="ty-rule"></div>
     <h2 class="ty-h">FATTO.<br><span>CI SIAMO.</span></h2>
     <div class="ty-rule"></div>
-    <p class="ty-p">Abbiamo ricevuto le tue risposte. Ti contatteremo a breve per confermare il posto — i posti sono limitati, sei in lista!</p>
+    <p class="ty-p">Abbiamo ricevuto le tue risposte. Verdiana ti contatterà a breve per confermare il posto.</p>
+    <p class="ty-p" style="margin-top:8px;font-size:14px;color:var(--gray);">Vuoi accelerare? Scrivi tu a Verdiana ora — i tuoi dati sono già pronti nel messaggio.</p>
+    <a href="#" id="v-thankyou-wa" class="ty-wa-btn" target="_blank" rel="noopener">
+      <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+        <path d="M16 2C8.27 2 2 8.27 2 16c0 2.5.66 4.93 1.91 7.06L2 30l7.07-1.86A13.93 13.93 0 0016 30c7.73 0 14-6.27 14-14S23.73 2 16 2zm7.7 19.96c-.33.92-1.94 1.77-2.7 1.84-.71.07-1.62.1-2.61-.16-.6-.16-1.37-.42-2.36-.86-4.16-1.8-6.87-6-7.08-6.27-.21-.27-1.7-2.27-1.7-4.32 0-2.06 1.08-3.07 1.46-3.49.39-.42.85-.52 1.13-.52.28 0 .56.01.81.02.26.01.6-.1.95.72.34.83 1.16 2.86 1.26 3.07.1.21.17.46.03.74-.13.27-.2.45-.41.69-.21.24-.43.54-.62.72-.21.21-.42.43-.18.84.24.41 1.07 1.77 2.31 2.87 1.59 1.42 2.93 1.86 3.34 2.07.41.21.65.18.89-.11.24-.28 1.03-1.21 1.31-1.62.27-.41.55-.34.92-.21.37.13 2.39 1.13 2.8 1.34.41.21.69.31.79.48.1.17.1 1.01-.23 1.99z" fill="#0A0A0A"/>
+      </svg>
+      Scrivi ora a Verdiana
+    </a>
+    <p class="ty-p" style="margin-top:20px;font-size:12px;color:var(--gray);letter-spacing:0.05em;">Posti limitati — i contatti vengono lavorati in ordine di arrivo</p>
   </div>
 </section>
 
@@ -1077,8 +1088,39 @@ function submitForm(id){
   document.getElementById('videoask-section').querySelector('.video-container').style.display='none';
   document.getElementById(id+'-thankyou').classList.add('show');
   document.getElementById('topBar').style.width='100%';
-  const url='INSERISCI_URL_GOOGLE_APPS_SCRIPT';
-  if(!url.includes('INSERISCI'))fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({source:'fuoriclasse',...state[id].answers})}).catch(()=>{});
+
+  // ── INVIO DATI A GOOGLE SHEETS ──
+  // Sostituisci CRM_URL con l'URL della tua Web App Apps Script
+  const CRM_URL='INSERISCI_URL_GOOGLE_APPS_SCRIPT';
+  const payload={
+    source:'fuoriclasse-estate',
+    timestamp:new Date().toISOString(),
+    ...state[id].answers
+  };
+  if(!CRM_URL.includes('INSERISCI')){
+    fetch(CRM_URL,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    }).catch(err=>console.warn('CRM submit failed:',err));
+  }
+
+  // ── COSTRUISCE LINK WHATSAPP PRECOMPILATO ──
+  // Quando il lead completa il form, può cliccare "Scrivi ora a Verdiana"
+  // e parte WhatsApp con tutti i suoi dati già pronti
+  const ans=state[id].answers;
+  const waMsg=`Ciao Verdiana! Ho appena compilato il modulo su Fuoriclasse Estate.%0A%0A`+
+    `👤 *Nome:* ${ans.nome||'-'}%0A`+
+    `🎂 *Età:* ${ans.eta||'-'}%0A`+
+    `🏫 *Scuola:* ${ans.scuola||'-'}%0A%0A`+
+    `*Situazione:* ${ans.situazione||'-'}%0A`+
+    `*Tentativi:* ${ans.tentativi||'-'}%0A`+
+    `*Desiderio:* ${ans.desiderio||'-'}%0A%0A`+
+    `Vorrei prenotare un posto.`;
+  const waLink=`https://wa.me/393474387660?text=${waMsg}`;
+  const waBtn=document.getElementById(id+'-thankyou-wa');
+  if(waBtn)waBtn.href=waLink;
 }
 
 function buildProgress(id){
